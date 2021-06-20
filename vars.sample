@@ -1,0 +1,26 @@
+application_access: lb-public
+namespace: nginx-teste
+
+application: nginx
+container_tag: latest
+container_repository: nginx
+container_port: 80
+container_protocol: TCP
+liveness_probe_path: "/"
+liveness_probe_port: 80
+liveness_initial_delay_seconds: 20
+liveness_period_seconds: 20
+liveness_timeout_seconds: 15
+requests_cpu: 20m
+requests_memory: 50Mi
+limits_cpu: 25m
+limits_memory: 80Mi
+
+
+svc_port: 80
+hpa_max_replicas: 10
+hpa_min_replicas: 2
+
+secrets:
+  REDIS_HOST: redis-service.default.svc.cluster.local
+  REDIS_PORT: 9000

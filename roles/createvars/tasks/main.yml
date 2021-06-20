@@ -3,6 +3,8 @@
   set_fact:
     #optional_vars_secrets: "{{ lookup('env', 'SECRETS')| to_json}}"
     optional_vars_secrets: "{{ lookup('file', 'secrets.json')}}"
+    optional_vars_kubernetes: "{{ lookup('file', 'kubernetes.json')}}"
+
 - name: Create secrets vars
   debug:
     msg: "'{{ lookup('env', 'SECRETS') }}' is the HOME environment variable."
@@ -16,3 +18,9 @@
     src: secret-vars-file.j2
     dest: "secret-vars-file.yaml"
   when: optional_vars_secrets is defined
+
+- name: Create kubernetes variables file 
+  template:
+    src: kubernetes-vars-file.j2
+    dest: "kubernetes-vars-file.yaml"
+  when: optional_vars_kubernetes is defined
