@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{application}}
+  namespace: {{namespace}}
+  labels:
+    app: {{application}}
+spec:
+  replicas: {{replicas | default('1')}}
+  selector:
+    matchLabels:
+      app: {{application}}
+  strategy:
+      type: RollingUpdate
+  revisionHistoryLimit: {{ revision_history_limit | default('3') }}
+  template:
+    metadata:
+      labels:
+        app: {{application}}
+    spec:
+      containers:
+{%if container_repository is defined%}      
+      - image: {{container_repository}}/{{application}}:{{container_tag}}
+{%else%}
+      - image: {{application}}:{{container_tag}}
+{%endif%}
+        name: {{application}}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: {{container_port}}
+          protocol: {{container_protocol}}
+{%if secrets is defined%}
+        env:
+{%for key, value in secrets.items()%}
+        - name: {{key}}
+          valueFrom:
+            secretKeyRef:
+              name: {{application}}-secret
+              key: {{key}}
+{%endfor%}
+{%endif%}
+        livenessProbe:
+          httpGet:
+            path: {{liveness_probe_path}}
+            port: {{liveness_probe_port | default('container_port')}}
+          initialDelaySeconds: {{liveness_initial_delay_seconds | default('10') }}
+          periodSeconds: {{liveness_period_seconds | default('5') }}
+          timeoutSeconds: {{liveness_timeout_seconds | default('10') }}
+        readinessProbe:
+          httpGet:
+            path: {{readiness_probe_path | default(liveness_probe_path)}}
+            port: {{readiness_probe_port | default(container_port)}}
+          initialDelaySeconds: {{readiness_initial_delay_seconds | default('0') }}
+          periodSeconds: {{readiness_period_seconds | default('10') }}
+          timeoutSeconds: {{readiness_timeout_seconds | default('1') }}
+        resources:
+          requests:
+            cpu: {{requests_cpu}}
+            memory: {{requests_memory}}
+          limits:
+            cpu: {{limits_cpu}}
+            memory: {{limits_memory}}

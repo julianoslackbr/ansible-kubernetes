@@ -1,0 +1,25 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{application}}
+  namespace: {{namespace}}
+  labels:
+    app: {{application}}
+{% if  application_access == 'lb-private' %}
+  annotations:
+    cloud.google.com/neg: '{"ingress":true}'
+    cloud.google.com/load-balancer-type: Internal
+{%endif%}
+spec:
+  selector:
+    app: {{application}}
+  ports:
+  - port: {{svc_port | default(container_port)}}
+    targetPort: {{container_port}}
+    protocol: {{svc_protocol| default('TCP')}}
+{% if application_access in ['lb-private','lb-public'] %}
+{% set svc_type = 'LoadBalancer' %}
+{% elif application_access == 'nodeport' %}
+{% set svc_type = 'NodePort' %}
+{% endif %}
+  type: {{svc_type | default('ClusterIP')}}

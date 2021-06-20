@@ -1,0 +1,15 @@
+# install dependencias
+# pip3 install kubernetes==11.0.0 openshift==0.11.0
+---
+- hosts: "{{ hosts | default ('localhost')}}"
+  connection: local
+  gather_facts: false
+
+    
+  vars:
+    optional_vars_file: "{{ lookup('first_found', 'vars.yml', errors='ignore') }}"
+    
+    
+  roles:
+    - kubernetes
+

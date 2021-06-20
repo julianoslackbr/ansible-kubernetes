@@ -1,0 +1,27 @@
+# install dependencias
+# pip3 install kubernetes==11.0.0 openshift==0.11.0 pyyaml
+---
+- hosts: "{{ hosts | default ('localhost')}}"
+  connection: local
+  gather_facts: false
+
+  vars:
+    
+    application_type: cronjob
+    namespace: cron-teste
+    schedule: "*/2 * * * *"
+
+    application: busybox
+    container_tag: latest
+    container_repository: busybox
+    cronjob_args:
+      - "/bin/sh"
+      - "-c"
+      - "date; echo Hello from the Kubernetes cluster"
+
+    secrets:
+      REDIS_HOST: redis-service.default.svc.cluster.local
+      REDIS_PORT: 9000
+      
+  roles:
+    - kubernetes

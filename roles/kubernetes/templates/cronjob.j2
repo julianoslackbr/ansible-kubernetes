@@ -1,0 +1,45 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{application}}
+  namespace: {{namespace}}
+  labels:
+    app: {{application}}
+spec:
+  schedule: "{{schedule}}"
+  startingDeadlineSeconds: {{starting_deadline_seconds |default('60')}}
+  concurrencyPolicy: {{concurrency_policy |default('Forbid')}}
+  successfulJobsHistoryLimit: {{successful_jobsHistory_limit |default(3)}}
+  failedJobsHistoryLimit: {{failed_jobsHistory_limit |default(3)}}
+  suspend: {{suspend |default('false')}}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{application}}
+        spec:
+          restartPolicy: {{restart_policy | default('OnFailure')}}
+          containers:
+          - name: {{application}}
+{%if container_repository is defined%}      
+            image: {{container_repository}}/{{application}}:{{container_tag}}
+{%else%}
+            image: {{application}}:{{container_tag}}
+{%endif%}
+{%if cronjob_args is defined%}
+            args: 
+{%for args in cronjob_args%}
+            - "{{args}}"
+{%endfor%}
+{%endif%}
+{%if secrets is defined%}
+            env:
+{%for key, value in secrets.items()%}
+            - name: {{key}}
+              valueFrom:
+                secretKeyRef:
+                  name: {{application}}-secret
+                  key: {{key}}
+{%endfor%}
+{%endif%}          

@@ -1,0 +1,128 @@
+---
+
+- name: Load vars file
+  when: optional_vars_file is file
+  include_vars: "{{ optional_vars_file }}"
+
+- name: Check common default variables defined
+  fail:
+    msg: Check common defined variables
+  when: 
+    - application_access is undefined or
+      namespace is undefined or
+      application is undefined
+
+- name: Check ingress variables defined
+  fail:
+    msg: Check ingress variables defined
+  when: 
+    - application_access in ["ingress-public", "ingress-private"] and
+      ingress_host is undefined
+
+- name: Set default manifest directory
+  set_fact:
+    manifest_dir: ./k8s
+    
+- name: Create manifests directory
+  file:
+    path: "{{manifest_dir}}"
+    state: directory
+    mode: 0755
+
+- name: K8S create namespace {{namespace}}
+  template:
+    src: namespace.j2
+    dest: "{{manifest_dir}}/namespace.yaml"
+
+- name: K8S create deployment {{application}}
+  template:
+    src: deployment.j2
+    dest: "{{manifest_dir}}/deployment.yaml"
+  when: 
+      - application_access is defined
+
+- name: K8S create secrets {{application}}
+  template:
+    src: secret.j2
+    dest: "{{manifest_dir}}/secret.yaml"
+  when: secrets is defined
+
+- name: K8S create services {{application}}
+  template:
+    src: service.j2
+    dest: "{{manifest_dir}}/service.yaml"
+  when: 
+    - application_access in [ "lb-public", "lb-private", "nodeport", "clusterip" ]
+
+- name: K8S create hpa {{application}}
+  template:
+    src: hpa.j2
+    dest: "{{manifest_dir}}/hpa.yaml"
+  when: 
+    - application_access in [ "lb-public", "lb-private", "ingress-public", "nodeport", "clusterip" ]
+
+- name: K8S create ingress {{application}}
+  template:
+    src: ingress.j2
+    dest: "{{manifest_dir}}/ingress.yaml"
+  when: 
+    - application_access == "ingress-public"
+
+- name: K8S cronjob {{application}}
+  template:
+    src: cronjob.j2
+    dest: "{{manifest_dir}}/cronjob.yaml"
+  when: 
+    - application_access == "cronjob"
+
+- name: Find K8S manifests files 
+  find: 
+    path: ./k8s
+  register: find_manifest
+
+- name: Manifests list
+  debug:
+    msg: "{{item.path}}"
+  with_items: "{{find_manifest.files}}"
+  
+
+- name: Create resources from manifests - cronjob
+  k8s:
+    state: present
+    src: "{{manifest_dir}}/{{item}}"
+  with_items:
+    - namespace.yaml
+    - secret.yaml
+    - cronjob.yaml
+  when: application_access == "cronjob"
+  register: apply_result
+  until: apply_result is success
+
+- name: Create resources from manifests - services access
+  k8s:
+    state: present
+    src: "{{manifest_dir}}/{{item}}"
+  with_items:
+    - namespace.yaml
+    - secret.yaml
+    - deployment.yaml
+    - service.yaml
+    - hpa.yaml
+  when: 
+    - application_access in [ "lb-public", "lb-private", "nodeport", "clusterip" ]
+  register: apply_result
+  until: apply_result is success
+
+- name: Create resources from manifests - ingress access
+  k8s:
+    state: present
+    src: "{{manifest_dir}}/{{item}}"
+  with_items:
+    - namespace.yaml
+    - secret.yaml
+    - deployment.yaml
+    - ingress.yaml
+    - hpa.yaml
+  when: application_access == "ingress-public"
+  register: apply_result
+  until: apply_result is success
