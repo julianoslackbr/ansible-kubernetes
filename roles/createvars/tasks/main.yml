@@ -5,13 +5,13 @@
     optional_vars_secrets: "{{ lookup('file', 'secrets.json', errors='ignore')}}"
     optional_vars_kubernetes: "{{ lookup('file', 'kubernetes.json', errors='ignore')}}"
 
-- name: Create secrets vars
-  debug:
-    msg: "'{{ lookup('env', 'SECRETS') }}' is the HOME environment variable."
+# - name: Create secrets vars
+#   debug:
+#     msg: "'{{ lookup('env', 'SECRETS') }}' is the HOME environment variable."
 
-- name: Create secrets vars
-  debug:
-    msg: "'{{ optional_vars_secrets }}' is the from SET environment variable."
+# - name: Create secrets vars
+#   debug:
+#     msg: "'{{ optional_vars_secrets }}' is the from SET environment variable."
 
 - name: Create secret variables file 
   template:
