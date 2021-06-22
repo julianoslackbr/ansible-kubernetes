@@ -2,11 +2,11 @@
 
 - name: Load secrets vars file
   include_vars: "{{ secrets_vars_file }}"
-  #when: secrets_vars_file is file
+  when: secrets_vars_file is file
 
 - name: Load kubernetes vars file
   include_vars: "{{ kubernetes_vars_file }}"
-  #when: kubernetes_vars_file is file
+  when: kubernetes_vars_file is file
 
 - name: Check common default variables defined
   fail:
