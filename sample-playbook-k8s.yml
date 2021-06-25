@@ -7,7 +7,7 @@
   gather_facts: false
     
   vars:
-    secrets_vars_file: "{{ lookup('first_found', 'secret-vars-file.yaml') }}"
+    secrets_vars_file: "{{ lookup('first_found', 'secrets-vars-file.yaml') }}"
     kubernetes_vars_file: "{{ lookup('first_found', 'kubernetes-vars-file.yaml') }}"
     
   roles:
