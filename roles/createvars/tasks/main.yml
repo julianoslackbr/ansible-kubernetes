@@ -1,26 +1,25 @@
 ---
 - name: Set variables
   set_fact:
-    #optional_vars_secrets: "{{ lookup('env', 'SECRETS')| to_json}}"
-    optional_vars_secrets: "{{ lookup('file', 'secrets.json', errors='ignore')}}"
-    optional_vars_kubernetes: "{{ lookup('file', 'kubernetes.json', errors='ignore')}}"
+    container_tag: "{{ lookup('env', 'TAG')}}"
+    optional_vars_kubernetes: "{{ lookup('env', 'SECRETS_CONTEXT', errors='ignore')}}"
 
-# - name: Create secrets vars
-#   debug:
-#     msg: "'{{ lookup('env', 'SECRETS') }}' is the HOME environment variable."
+    #optional_vars_secrets: "{{ lookup('file', 'secrets.json', errors='ignore')}}"
+    #optional_vars_kubernetes: "{{ lookup('file', 'kubernetes.json', errors='ignore')}}"
 
-# - name: Create secrets vars
-#   debug:
-#     msg: "'{{ optional_vars_secrets }}' is the from SET environment variable."
 
+# cria arquivos com secrets k8s
 - name: Create secret variables file 
   template:
-    src: secret-vars-file.j2
-    dest: "secret-vars-file.yaml"
-  when: optional_vars_secrets != ""
-
+    src: secrets-vars-file.j2
+    dest: secrets-vars-file.yaml
+  when: optional_vars_kubernetes != ""
+# cria arquivos de variaveis k8s
 - name: Create kubernetes variables file 
   template:
     src: kubernetes-vars-file.j2
-    dest: "kubernetes-vars-file.yaml"
+    dest: kubernetes-vars-file.yaml
   when: optional_vars_kubernetes != ""
+
+
+

@@ -1,3 +1,5 @@
 {%for key, value in optional_vars_kubernetes.items()%}
-{{key.lower()}}: {{value}}
+{% if key.endswith('_')%}
+{{key.lower().replace('_', '')}}: {{value}}
+{%endif%}
 {%endfor%}
