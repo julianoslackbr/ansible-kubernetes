@@ -19,6 +19,3 @@
     src: kubernetes-vars-file.j2
     dest: kubernetes-vars-file.yaml
   when: optional_vars_kubernetes != ""
-
-
-
