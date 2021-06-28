@@ -1,5 +1,5 @@
 {%for key, value in optional_vars_kubernetes.items()%}
-{% if not key.startswith('_')%}
+{% if not key.startswith('_') and not key.startswith('K8S')%}
 {{key.lower()}}: {{value}}
 {%endif%}
 {%endfor%}
