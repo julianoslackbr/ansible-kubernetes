@@ -42,7 +42,7 @@ spec:
         livenessProbe:
           httpGet:
             path: {{liveness_probe_path}}
-            port: {{liveness_probe_port | default('container_port')}}
+            port: {{liveness_probe_port | default(container_port)}}
           initialDelaySeconds: {{liveness_initial_delay_seconds | default('10') }}
           periodSeconds: {{liveness_period_seconds | default('5') }}
           timeoutSeconds: {{liveness_timeout_seconds | default('10') }}
