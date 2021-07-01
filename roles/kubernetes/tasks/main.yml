@@ -101,6 +101,8 @@
   when: application_access == "cronjob"
   register: apply_result
   until: apply_result is success
+  tags:
+    - apply
 
 - name: Create resources from manifests - services access
   k8s:
@@ -116,6 +118,8 @@
     - application_access in [ "lb-public", "lb-private", "nodeport", "clusterip" ]
   register: apply_result
   until: apply_result is success
+  tags:
+    - apply
 
 - name: Create resources from manifests - ingress access
   k8s:
@@ -131,3 +135,5 @@
   when: application_access == "ingress-public"
   register: apply_result
   until: apply_result is success
+  tags:
+    - apply
