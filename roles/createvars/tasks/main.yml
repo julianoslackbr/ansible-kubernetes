@@ -4,7 +4,6 @@
     container_tag: "{{ lookup('env', 'TAG')}}"
     optional_vars_kubernetes: "{{ lookup('env', 'SECRETS_CONTEXT', errors='ignore')}}"
     # input de variaveis por arquivos
-    #optional_vars_kubernetes: "{{ lookup('file', 'secrets.json', errors='ignore')}}"
     #optional_vars_kubernetes: "{{ lookup('file', 'kubernetes.json', errors='ignore')}}"
 
 # cria arquivos com secrets k8s
