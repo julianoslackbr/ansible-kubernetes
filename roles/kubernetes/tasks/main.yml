@@ -26,6 +26,7 @@
 - name: Set default manifest directory
   set_fact:
     manifest_dir: ./k8s
+    deploy: false
     
 - name: Create manifests directory
   file:
@@ -97,7 +98,7 @@
     - namespace.yaml
     - secret.yaml
     - cronjob.yaml
-  when: application_access == "cronjob" and deployment = true
+  when: application_access == "cronjob" and deploy == true
   register: apply_result
   until: apply_result is success
 
@@ -113,7 +114,7 @@
     - hpa.yaml
   when: 
     - application_access in [ "lb-public", "lb-private", "nodeport", "clusterip" ] and
-    deployment == true
+    deploy == true
   register: apply_result
   until: apply_result is success
 
@@ -128,6 +129,6 @@
     - service.yaml
     - ingress.yaml
     - hpa.yaml
-  when: application_access == "ingress-public" and deployment == true
+  when: application_access == "ingress-public" and deploy == true
   register: apply_result
   until: apply_result is success
