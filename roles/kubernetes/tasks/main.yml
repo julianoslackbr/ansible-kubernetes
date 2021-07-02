@@ -114,7 +114,7 @@
     - hpa.yaml
   when: 
     - application_access in [ "lb-public", "lb-private", "nodeport", "clusterip" ] and
-    deploy == true
+      deploy == true
   register: apply_result
   until: apply_result is success
 
