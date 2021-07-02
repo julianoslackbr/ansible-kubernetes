@@ -89,7 +89,6 @@
     msg: "{{item.path}}"
   with_items: "{{find_manifest.files}}"
   
-
 - name: Create resources from manifests - cronjob
   k8s:
     state: present
@@ -98,11 +97,9 @@
     - namespace.yaml
     - secret.yaml
     - cronjob.yaml
-  when: application_access == "cronjob"
+  when: application_access == "cronjob" and deployment = true
   register: apply_result
   until: apply_result is success
-  tags:
-    - apply
 
 - name: Create resources from manifests - services access
   k8s:
@@ -115,11 +112,10 @@
     - service.yaml
     - hpa.yaml
   when: 
-    - application_access in [ "lb-public", "lb-private", "nodeport", "clusterip" ]
+    - application_access in [ "lb-public", "lb-private", "nodeport", "clusterip" ] and
+    deployment == true
   register: apply_result
   until: apply_result is success
-  tags:
-    - apply
 
 - name: Create resources from manifests - ingress access
   k8s:
@@ -132,8 +128,6 @@
     - service.yaml
     - ingress.yaml
     - hpa.yaml
-  when: application_access == "ingress-public"
+  when: application_access == "ingress-public" and deployment == true
   register: apply_result
   until: apply_result is success
-  tags:
-    - apply
