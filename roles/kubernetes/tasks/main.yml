@@ -98,7 +98,7 @@
     - namespace.yaml
     - secret.yaml
     - cronjob.yaml
-  when: application_access == "cronjob" and deploy == true
+  when: application_access == "cronjob" and deploy|bool == true
   register: apply_result
   until: apply_result is success
 
@@ -114,7 +114,7 @@
     - hpa.yaml
   when: 
     - application_access in [ "lb-public", "lb-private", "nodeport", "clusterip" ] and
-      deploy == true
+      deploy|bool == true
   register: apply_result
   until: apply_result is success
 
@@ -129,6 +129,6 @@
     - service.yaml
     - ingress.yaml
     - hpa.yaml
-  when: application_access == "ingress-public" and deploy == true
+  when: application_access == "ingress-public" and deploy|bool == true
   register: apply_result
   until: apply_result is success
